@@ -2198,6 +2198,11 @@ def view_form_entry(request, form_entry_slug, theme=None, template_name=None):
     )
 
     if request.method == 'POST':
+        request.fobi = {
+            'form_callback_results': {},
+            'form_handler_results': {},
+        }
+
         form = form_cls(request.POST, request.FILES)
 
         # Fire pre form validation callbacks

@@ -93,6 +93,8 @@ class DBStoreHandlerPlugin(FormHandlerPlugin):
         )
         saved_form_data_entry.save()
 
+        request.fobi['form_handler_results'][UID] = saved_form_data_entry
+
     def custom_actions(self, form_entry, request=None):
         """Custom actions.
 
