@@ -10,6 +10,7 @@
 {% block navbar-menu-right-content %}
             <li class="active"><a href="{% url 'fobi.dashboard' %}">{% trans "Forms" %}</a></li>
             <li><a href="{% url 'fobi.form_wizards_dashboard' %}">{% trans "Wizards" %}</a></li>
+            <li><a href="{% url 'logout' %}?next={% url 'fobi.dashboard' %}">{% trans "Logout" %}</a></li>
 {% endblock navbar-menu-right-content %}
 
 {% block main-content-inner-attrs %}{% endblock main-content-inner-attrs %}
