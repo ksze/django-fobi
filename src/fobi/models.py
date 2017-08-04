@@ -379,6 +379,10 @@ class FormEntry(models.Model):
                                    auto_now_add=True)
     updated = models.DateTimeField(_("Updated"), null=True, blank=True,
                                    auto_now=True)
+    is_locked = models.BooleanField(
+        _("Locked against editing?"), default=False,
+        help_text=_("Whether the form entry is locked against editing."),
+    )
 
     class Meta(object):
         """Meta class."""

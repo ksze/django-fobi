@@ -173,14 +173,14 @@ class FormEntryAdmin(admin.ModelAdmin):
     """FormEntry admin."""
 
     list_display = ('name', 'slug', 'user', 'is_public', 'created', 'updated',
-                    'is_cloneable',)
-    list_editable = ('is_public', 'is_cloneable',)
-    list_filter = ('is_public', 'is_cloneable',)
+                    'is_cloneable', 'is_locked')
+    list_editable = ('is_public', 'is_cloneable', 'is_locked')
+    list_filter = ('is_public', 'is_cloneable', 'is_locked')
     readonly_fields = ('slug',)
     radio_fields = {"user": admin.VERTICAL}
     fieldsets = (
         (_("Form"), {
-            'fields': ('name', 'is_public', 'is_cloneable',)
+            'fields': ('name', 'is_public', 'is_cloneable', 'is_locked')
         }),
         (_("Custom"), {
             'classes': ('collapse',),

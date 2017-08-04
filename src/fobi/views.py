@@ -436,6 +436,10 @@ def edit_form_entry(request, form_entry_id, theme=None, template_name=None):
     except ObjectDoesNotExist as err:
         raise Http404(ugettext("Form entry not found."))
 
+    if form_entry.is_locked:
+        messages.error(request, _("Form \"{0}\" is locked against editing.").format(form_entry.name))
+        return redirect(reverse('fobi.dashboard'))
+
     if request.method == 'POST':
         # The form entry form (does not contain form elements)
         form = FormEntryForm(request.POST, request.FILES, instance=form_entry,
@@ -614,6 +618,10 @@ def delete_form_entry(request, form_entry_id, template_name=None):
             .get(pk=form_entry_id, user__pk=request.user.pk)
     except ObjectDoesNotExist as err:
         raise Http404(ugettext("Form entry not found."))
+
+    if obj.is_locked:
+        messages.error(request, _("Form \"{0}\" is locked against deletion.").format(obj.name))
+        return redirect(reverse('fobi.dashboard'))
 
     obj.delete()
 
