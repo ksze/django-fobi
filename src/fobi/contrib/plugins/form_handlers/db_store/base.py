@@ -186,6 +186,8 @@ class DBStoreWizardHandlerPlugin(FormWizardHandlerPlugin):
         )
         saved_form_wizard_data_entry.save()
 
+        request.fobi['form_handler_results'][UID] = saved_form_wizard_data_entry
+
     def custom_actions(self, form_wizard_entry, request=None):
         """Custom actions.
 
