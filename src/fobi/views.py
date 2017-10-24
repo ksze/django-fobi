@@ -2471,7 +2471,7 @@ def import_form_entry(request, template_name=None):
             # )
             #
             # # In this way we keep possible trash out.
-            # for key in form_data.keys():
+            # for key in list(form_data.keys()):
             #     if key not in form_data_keys_whitelist:
             #         form_data.pop(key)
             #
@@ -2678,7 +2678,7 @@ def import_form_wizard_entry(request, template_name=None):
             )
 
             # In this way we keep possible trash out.
-            for key in form_wizard_data.keys():
+            for key in list(form_wizard_data.keys()):
                 if key not in form_wizard_data_keys_whitelist:
                     form_wizard_data.pop(key)
 

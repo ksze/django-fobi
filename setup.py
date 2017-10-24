@@ -4,7 +4,7 @@ import sys
 from distutils.version import LooseVersion
 from setuptools import setup, find_packages
 
-version = '0.12.2'
+version = '0.12.5'
 
 # ***************************************************************************
 # ************************** Python version *********************************
@@ -346,6 +346,9 @@ else:
         #     'master.tar.gz'
         #     '#egg=easy-thumbnails'
         # )
+
+# if PYPY:
+#     install_requires.remove('Pillow>=2.0.0')
 
 setup(
     name='django-fobi',
