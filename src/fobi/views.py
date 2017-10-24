@@ -1702,6 +1702,10 @@ class FormWizardView(DynamicSessionWizardView):
         except ObjectDoesNotExist as err:
             raise Http404(ugettext("Form wizard entry not found."))
 
+        self.request.fobi = {
+            'form_handler_results': {},
+        }
+
         # Run all handlers
         handler_responses, handler_errors = run_form_wizard_handlers(
             form_wizard_entry=form_wizard_entry,
