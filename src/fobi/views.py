@@ -259,7 +259,8 @@ def dashboard(request, theme=None, template_name=None):
     """
     form_entries = FormEntry._default_manager \
                             .filter(user__pk=request.user.pk) \
-                            .select_related('user')
+                            .select_related('user') \
+                            .order_by('name')
 
     context = {
         'form_entries': form_entries,
@@ -307,7 +308,8 @@ def form_wizards_dashboard(request, theme=None, template_name=None):
     """
     form_wizard_entries = FormWizardEntry._default_manager \
         .filter(user__pk=request.user.pk) \
-        .select_related('user')
+        .select_related('user') \
+        .order_by('name')
 
     context = {
         'form_wizard_entries': form_wizard_entries,
