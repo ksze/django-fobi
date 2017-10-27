@@ -4,7 +4,7 @@ __copyright__ = '2014-2017 Artur Barseghyan'
 __license__ = 'GPL 2.0/LGPL 2.1'
 __all__ = (
     'ALLOWED_TAGS',
-    'ALLOWED_TAGS',
+    'ALLOWED_ATTRIBUTES',
 )
 
 ALLOWED_TAGS = [
