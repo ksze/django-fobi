@@ -345,13 +345,12 @@ class DynamicWizardView(TemplateView):
         just starts at the first step or wants to restart the process.
         The data of the wizard will be resetted before rendering the first step
         """
-        # TODO: Don't know if I should leave it like this. Perhaps, just
-        # never reset on this step.
-        if self.storage.current_step == self.steps.first:
+        if request.GET.get('new', 'f') == 't':
             self.storage.reset()
 
-        # reset the current step to the first step.
-        self.storage.current_step = self.steps.first
+            # reset the current step to the first step.
+            self.storage.current_step = self.steps.first
+
         return self.render(self.get_form())
 
     # def post(self, request, *args, **kwargs):
