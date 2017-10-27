@@ -1618,6 +1618,8 @@ class FormWizardView(DynamicSessionWizardView):
             else:
                 # proceed to the next step
                 return self.render_next_step(form)
+        else:
+            messages.error(self.request, _('There are errors in some form fields. Please check your answers and submit again.'))
         return self.render(form)
 
     def get_ignorable_field_names(self, form_element_entries):
