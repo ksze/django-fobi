@@ -127,7 +127,7 @@
       {% block main-content %}
       <div class="row row-offcanvas row-offcanvas-right">
 
-        <div{#% block main-content-inner-attrs %#} class="col-xs-12 col-sm-9"{#% endblock main-content-inner-attrs %#}>
+          <div{#% block main-content-inner-attrs %#} class="{% block main-div-class %}col-xs-12 col-sm-9{% endblock main-div-class %}"{#% endblock main-content-inner-attrs %#}>
           {% block responsive-nav %}
           <p class="pull-right visible-xs">
             <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
