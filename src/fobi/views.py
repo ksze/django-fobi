@@ -2603,11 +2603,14 @@ def export_form_wizard_entry(request,
 
     data = {
         'name': form_wizard_entry.name,
+        'title': form_wizard_entry.title,
         'slug': form_wizard_entry.slug,
         'is_public': False,
         'is_cloneable': False,
         'success_page_title': form_wizard_entry.success_page_title,
         'success_page_message': form_wizard_entry.success_page_message,
+        'show_all_navigation_buttons': form_wizard_entry.show_all_navigation_buttons,
+        'wizard_type': form_wizard_entry.wizard_type,
         'form_wizard_forms': [],
         'form_wizard_handlers': [],
     }
@@ -2677,11 +2680,14 @@ def import_form_wizard_entry(request, template_name=None):
 
             form_wizard_data_keys_whitelist = (
                 'name',
+                'title',
                 'slug',
                 'is_public',
                 'is_cloneable',
                 'success_page_title',
                 'success_page_message',
+                'show_all_navigation_buttons',
+                'wizard_type',
                 'action',
             )
 

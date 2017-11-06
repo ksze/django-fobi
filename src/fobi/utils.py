@@ -690,6 +690,7 @@ def prepare_form_entry_export_data(form_entry,
     """
     data = {
         'name': form_entry.name,
+        'title': form_entry.title,
         'slug': form_entry.slug,
         'is_public': False,
         'is_cloneable': False,
