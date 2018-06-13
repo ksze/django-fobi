@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from fobi.dynamic import assemble_form_class
 
-from .base import print_info
+from .core import print_info
 from .data import TEST_DYNAMIC_FORMS_DEFINITION_DATA
 from .helpers import (
     create_form_with_entries,
@@ -14,7 +14,7 @@ from .helpers import (
 
 __title__ = 'fobi.tests.test_dynamic_forms'
 __author__ = 'Artur Barseghyan <artur.barseghyan@gmail.com>'
-__copyright__ = '2014-2017 Artur Barseghyan'
+__copyright__ = '2014-2018 Artur Barseghyan'
 __license__ = 'GPL 2.0/LGPL 2.1'
 __all__ = ('FobiDynamicFormsTest',)
 

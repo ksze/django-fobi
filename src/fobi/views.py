@@ -46,7 +46,7 @@ from .decorators import permissions_required, SATISFY_ALL, SATISFY_ANY
 from .dynamic import assemble_form_class
 from .form_importers import (
     ensure_autodiscover as ensure_importers_autodiscover,
-    form_importer_plugin_registry, get_form_impoter_plugin_urls
+    form_importer_plugin_registry, get_form_importer_plugin_urls
 )
 from .forms import (
     FormEntryForm,
@@ -67,7 +67,11 @@ from .models import (
     FormWizardFormEntry,
     FormWizardHandlerEntry
 )
-from .settings import GET_PARAM_INITIAL_DATA, DEBUG
+from .settings import (
+    GET_PARAM_INITIAL_DATA,
+    DEBUG,
+    SORT_PLUGINS_BY_VALUE,
+)
 from .utils import (
     append_edit_and_delete_links_to_field,
     get_user_form_element_plugins_grouped,
@@ -101,7 +105,7 @@ else:
 
 __title__ = 'fobi.views'
 __author__ = 'Artur Barseghyan <artur.barseghyan@gmail.com>'
-__copyright__ = '2014-2017 Artur Barseghyan'
+__copyright__ = '2014-2018 Artur Barseghyan'
 __license__ = 'GPL 2.0/LGPL 2.1'
 __all__ = (
     'add_form_element_entry',
@@ -264,7 +268,7 @@ def dashboard(request, theme=None, template_name=None):
 
     context = {
         'form_entries': form_entries,
-        'form_importers': get_form_impoter_plugin_urls(),
+        'form_importers': get_form_importer_plugin_urls(),
     }
 
     # If given, pass to the template (and override the value set by
@@ -313,7 +317,7 @@ def form_wizards_dashboard(request, theme=None, template_name=None):
 
     context = {
         'form_wizard_entries': form_wizard_entries,
-        # 'form_importers': get_form_impoter_plugin_urls(),
+        # 'form_importers': get_form_importer_plugin_urls(),
     }
 
     # If given, pass to the template (and override the value set by
@@ -536,7 +540,8 @@ def edit_form_entry(request, form_entry_id, theme=None, template_name=None):
 
     # List of form element plugins allowed to user
     user_form_element_plugins = get_user_form_element_plugins_grouped(
-        request.user
+        request.user,
+        sort_by_value=SORT_PLUGINS_BY_VALUE
     )
     # List of form handler plugins allowed to user
     user_form_handler_plugins = get_user_form_handler_plugins(
@@ -1466,9 +1471,13 @@ class FormWizardView(DynamicSessionWizardView):
 
     def get_initial_wizard_data(self, request, *args, **kwargs):
         """Get initial wizard data."""
+        if versions.DJANGO_GTE_1_10:
+            user_is_authenticated = request.user.is_authenticated
+        else:
+            user_is_authenticated = request.user.is_authenticated()
         try:
             qs_kwargs = {'slug': kwargs.get('form_wizard_entry_slug')}
-            if not request.user.is_authenticated():
+            if not user_is_authenticated:
                 kwargs.update({'is_public': True})
             form_wizard_entry = FormWizardEntry.objects \
                 .select_related('user') \
@@ -1694,9 +1703,13 @@ class FormWizardView(DynamicSessionWizardView):
 
     def done(self, form_list, **kwargs):
         """Done."""
+        if versions.DJANGO_GTE_1_10:
+            user_is_authenticated = self.request.user.is_authenticated
+        else:
+            user_is_authenticated = self.request.user.is_authenticated()
         try:
             qs_kwargs = {'slug': kwargs.get('form_wizard_entry_slug')}
-            if not self.request.user.is_authenticated():
+            if not user_is_authenticated:
                 kwargs.update({'is_public': True})
             form_wizard_entry = FormWizardEntry.objects \
                 .select_related('user') \
@@ -1736,9 +1749,13 @@ def form_wizard_entry_submitted(request, form_wizard_entry_slug=None,
     :param string template_name:
     :return django.http.HttpResponse:
     """
+    if versions.DJANGO_GTE_1_10:
+        user_is_authenticated = request.user.is_authenticated
+    else:
+        user_is_authenticated = request.user.is_authenticated()
     try:
         kwargs = {'slug': form_wizard_entry_slug}
-        if not request.user.is_authenticated():
+        if not user_is_authenticated:
             kwargs.update({'is_public': True})
         form_wizard_entry = FormWizardEntry._default_manager \
             .select_related('user') \
@@ -2194,14 +2211,37 @@ def view_form_entry(request, form_entry_slug, theme=None, template_name=None):
     :param string template_name:
     :return django.http.HttpResponse:
     """
+    if versions.DJANGO_GTE_1_10:
+        user_is_authenticated = request.user.is_authenticated
+    else:
+        user_is_authenticated = request.user.is_authenticated()
     try:
         kwargs = {'slug': form_entry_slug}
-        if not request.user.is_authenticated():
+        if not user_is_authenticated:
             kwargs.update({'is_public': True})
         form_entry = FormEntry._default_manager.select_related('user') \
                               .get(**kwargs)
     except ObjectDoesNotExist as err:
         raise Http404(ugettext("Form entry not found."))
+
+    if not form_entry.is_active:
+        context = {
+            'form_entry': form_entry,
+            'page_header': (form_entry.inactive_page_title
+                            or form_entry.title
+                            or form_entry.name),
+        }
+
+        if not template_name:
+            theme = get_theme(request=request, as_instance=True)
+            template_name = theme.form_entry_inactive_template
+
+        if versions.DJANGO_GTE_1_10:
+            return render(request, template_name, context)
+        else:
+            return render_to_response(
+                template_name, context, context_instance=RequestContext(request)
+            )
 
     form_element_entries = form_entry.formelemententry_set.all()[:]
 
@@ -2336,9 +2376,13 @@ def form_entry_submitted(request, form_entry_slug=None, template_name=None):
     :param string template_name:
     :return django.http.HttpResponse:
     """
+    if versions.DJANGO_GTE_1_10:
+        user_is_authenticated = request.user.is_authenticated
+    else:
+        user_is_authenticated = request.user.is_authenticated()
     try:
         kwargs = {'slug': form_entry_slug}
-        if not request.user.is_authenticated():
+        if not user_is_authenticated:
             kwargs.update({'is_public': True})
         form_entry = FormEntry._default_manager \
             .select_related('user') \

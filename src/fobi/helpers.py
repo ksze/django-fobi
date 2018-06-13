@@ -3,6 +3,7 @@ Helpers module. This module can be safely imported from any fobi (sub)module,
 since it never imports from any of the fobi (sub)modules (except for the
 `fobi.constants` and `fobi.exceptions` modules).
 """
+from __future__ import unicode_literals
 import glob
 import logging
 import os
@@ -18,13 +19,14 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.files.base import File
 # from django.db.utils import DatabaseError
 from django.http import HttpResponse
+from django.templatetags.static import static
 from django.test.client import RequestFactory
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import format_html_join
 from django.utils.translation import ugettext_lazy as _
 
 from nine.user import User
-from nine.versions import DJANGO_GTE_1_7, DJANGO_GTE_1_10
+from nine.versions import DJANGO_GTE_1_8, DJANGO_GTE_1_10
 
 # import simplejson as json
 
@@ -37,7 +39,7 @@ from .constants import (
 )
 from .exceptions import ImproperlyConfigured
 
-if DJANGO_GTE_1_7:
+if DJANGO_GTE_1_8:
     import django.apps
 else:
     from django.db import models
@@ -49,7 +51,7 @@ else:
 
 __title__ = 'fobi.helpers'
 __author__ = 'Artur Barseghyan <artur.barseghyan@gmail.com>'
-__copyright__ = '2014-2017 Artur Barseghyan'
+__copyright__ = '2014-2018 Artur Barseghyan'
 __license__ = 'GPL 2.0/LGPL 2.1'
 __all__ = (
     'admin_change_url',
@@ -106,10 +108,11 @@ def safe_text(text):
 
     :return str:
     """
-    if PY3:
-        return force_text(text, encoding='utf-8')
-    else:
-        return force_text(text, encoding='utf-8').encode('utf-8')
+    return smart_text(text)
+    # if PY3:
+    #     return force_text(text, encoding='utf-8')
+    # else:
+    #     return force_text(text, encoding='utf-8').encode('utf-8')
 
 
 def lists_overlap(sub, main):
@@ -188,6 +191,17 @@ def two_dicts_to_string(headers, data, html_element='p'):
 empty_string = text_type('')
 
 
+def absolute_path(path):
+    """
+    Given a relative or absolute path to a static asset, return an absolute
+    path. An absolute path will be returned unchanged while a relative path
+    will be passed to django.templatetags.static.static().
+    """
+    if path.startswith(('http://', 'https://', '/')):
+        return path
+    return static(path)
+
+
 def uniquify_sequence(sequence):
     """Uniqify sequence.
 
@@ -199,7 +213,8 @@ def uniquify_sequence(sequence):
     """
     seen = set()
     seen_add = seen.add
-    return [x for x in sequence if x not in seen and not seen_add(x)]
+    return [absolute_path(x)
+            for x in sequence if x not in seen and not seen_add(x)]
 
 
 def get_ignorable_form_values():
@@ -216,7 +231,7 @@ def get_model_name_for_object(obj):
     """Get model name for object.
 
     Django version agnostic."""
-    return obj._meta.model_name if DJANGO_GTE_1_7 else obj._meta.module_name
+    return obj._meta.model_name
 
 # *****************************************************************************
 # *****************************************************************************
@@ -331,18 +346,22 @@ def get_registered_models(ignore=[]):
         be in ``app_label.model`` format (example ``auth.User``).
     :return list:
     """
-    if DJANGO_GTE_1_7:
-        get_models = django.apps.apps.get_models
-    else:
-        def get_models():
-            """Get models."""
-            return models.get_models(include_auto_created=True)
+    get_models = django.apps.apps.get_models
+    # if DJANGO_GTE_1_7:
+    #     get_models = django.apps.apps.get_models
+    # else:
+    #     def get_models():
+    #         """Get models."""
+    #         return models.get_models(include_auto_created=True)
 
-    registered_models = [("{0}.{1}".format(_m._meta.app_label,
-                                           _m._meta.model_name),
-                          _m._meta.object_name)
-                         for _m
-                         in get_models()]
+    registered_models = [
+        (
+            "{0}.{1}".format(_m._meta.app_label, _m._meta.model_name),
+            _m._meta.object_name
+        )
+        for _m
+        in get_models()
+    ]
 
     # registered_models = []
     # try:
@@ -564,7 +583,11 @@ class StrippedUser(object):
         :return:
         """
         self._user = user
-        if not self._user.is_anonymous():
+        if DJANGO_GTE_1_10:
+            user_is_anonymous = self._user.is_anonymous
+        else:
+            user_is_anonymous = self._user.is_anonymous()
+        if not user_is_anonymous:
             setattr(self._user, User.USERNAME_FIELD, self._user.get_username())
         else:
             setattr(self._user, User.USERNAME_FIELD, None)
@@ -576,7 +599,11 @@ class StrippedUser(object):
 
     def get_username(self):
         """Get username."""
-        if not self._user.is_anonymous():
+        if DJANGO_GTE_1_10:
+            user_is_anonymous = self._user.is_anonymous
+        else:
+            user_is_anonymous = self._user.is_anonymous()
+        if not user_is_anonymous:
             try:
                 return self._user.get_username()
             except Exception as err:
@@ -584,7 +611,11 @@ class StrippedUser(object):
 
     def get_full_name(self):
         """Get full name."""
-        if not self._user.is_anonymous():
+        if DJANGO_GTE_1_10:
+            user_is_anonymous = self._user.is_anonymous
+        else:
+            user_is_anonymous = self._user.is_anonymous()
+        if not user_is_anonymous:
             try:
                 return self._user.get_full_name()
             except Exception as err:
@@ -592,7 +623,11 @@ class StrippedUser(object):
 
     def get_short_name(self):
         """Get short name."""
-        if not self._user.is_anonymous():
+        if DJANGO_GTE_1_10:
+            user_is_anonymous = self._user.is_anonymous
+        else:
+            user_is_anonymous = self._user.is_anonymous()
+        if not user_is_anonymous():
             try:
                 return self._user.get_full_name()
             except Exception as err:
@@ -600,7 +635,10 @@ class StrippedUser(object):
 
     def is_anonymous(self):
         """Is anonymous."""
-        return self._user.is_anonymous()
+        if DJANGO_GTE_1_10:
+            return self._user.is_anonymous
+        else:
+            return self._user.is_anonymous()
 
 
 class StrippedRequest(object):
@@ -713,11 +751,12 @@ class JSONDataExporter(object):
         :param str mimetype:
         :return django.http.HttpResponse:
         """
-        response_kwargs = {}
-        if DJANGO_GTE_1_7:
-            response_kwargs['content_type'] = mimetype
-        else:
-            response_kwargs['mimetype'] = mimetype
+        response_kwargs = {'content_type': mimetype}
+        # response_kwargs = {}
+        # if DJANGO_GTE_1_7:
+        #     response_kwargs['content_type'] = mimetype
+        # else:
+        #     response_kwargs['mimetype'] = mimetype
         return HttpResponse(**response_kwargs)
 
     def export_to_json(self):

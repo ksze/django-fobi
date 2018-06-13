@@ -11,7 +11,7 @@ from .forms import TextareaForm
 
 __title__ = 'fobi.contrib.plugins.form_elements.fields.textarea.base'
 __author__ = 'Artur Barseghyan <artur.barseghyan@gmail.com>'
-__copyright__ = '2014-2017 Artur Barseghyan'
+__copyright__ = '2014-2018 Artur Barseghyan'
 __license__ = 'GPL 2.0/LGPL 2.1'
 __all__ = ('TextareaPlugin',)
 
@@ -40,5 +40,8 @@ class TextareaPlugin(FormFieldPlugin):
             'required': self.data.required,
             'widget': Textarea(attrs=widget_attrs)
         }
+
+        if self.data.max_length is not None:
+            field_kwargs['max_length'] = self.data.max_length
 
         return [(self.data.name, CharField, field_kwargs)]

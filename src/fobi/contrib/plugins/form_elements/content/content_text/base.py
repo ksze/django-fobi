@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from collections import OrderedDict
 from uuid import uuid4
 
-from django.template.loader import render_to_string
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 
@@ -16,7 +15,7 @@ from .forms import ContentTextForm
 
 __title__ = 'fobi.contrib.plugins.form_elements.content.content_text.base'
 __author__ = 'Artur Barseghyan <artur.barseghyan@gmail.com>'
-__copyright__ = '2014-2017 Artur Barseghyan'
+__copyright__ = '2014-2018 Artur Barseghyan'
 __license__ = 'GPL 2.0/LGPL 2.1'
 __all__ = ('ContentTextPlugin',)
 
@@ -48,15 +47,15 @@ class ContentTextPlugin(FormElementPlugin):
         )
 
     def get_rendered_text(self):
-        """Get rendered image."""
-        rendered_text = "<p>{0}</p>".format(smart_str(self.data.text))
+        """Get rendered text."""
+        rendered_text = '<div class="content-text">{0}</div>'.format(smart_str(self.data.text))
         return rendered_text
 
     def get_form_field_instances(self, request=None, form_entry=None,
                                  form_element_entries=None, **kwargs):
         """Get form field instances."""
         field_kwargs = {
-            'initial': '<div class="content-text">{}</div>'.format(smart_str(self.data.text)),
+            'initial': self.get_rendered_text(),
             'required': False,
             'label': '',
         }

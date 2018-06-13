@@ -15,6 +15,207 @@ are used for versioning (schema follows below):
   0.3.4 to 0.4).
 - All backwards incompatible changes are mentioned in this document.
 
+0.13.2
+------
+2018-03-12
+
+- Choices are now required fields for `checkbox_select_multiple`, `radio`,
+  `select`, `select_multiple` and `select_multiple_with_max` form elements.
+- The `active_date_from`, `active_date_to`, `inactive_page_title`,
+  `inactive_page_message` added to forms the import/export flow.
+
+0.13.1
+------
+2018-02-28
+
+- Minor fixes in recaptcha plugin.
+- Add `max_length` to textarea plugin.
+
+0.13
+----
+2018-02-25
+
+.. note::
+
+    This release contains minor backwards incompatible changes.
+    A number of new database fields have been added to the `FormEntry`
+    model (`active_date_from`, `active_date_to`, `inactive_page_title`,
+    `inactive_page_message`). You will need to migrate your database.
+
+- Implement disabling forms based on dates. Note, that although the feature
+  is landed into the core, contrib packages (such as Foundation 5 theme,
+  Simple theme, Django CMS admin style theme, DRF integration app,
+  FeinCMS integration app, Mezzanine integration app, DjangoCMS integration app
+  and Wagtail app) are not yet updated to reflect these changes. It's a work
+  in progress to be done in the nearest minor releases. Check the
+  `issue #143 <https://github.com/barseghyanartur/django-fobi/issues/143>`_
+  for state of the progress.
+
+0.12.20
+-------
+2018-02-24
+
+- Minor Python 2 fixes.
+
+0.12.19
+-------
+2018-02-21
+
+- Make it possible to sort on plugin ``name`` instead of ``uid``.
+
+0.12.18
+-------
+2018-02-19
+
+- Improved form element add drop-down order.
+- Add initial migrations for DjangoCMS integration app.
+- Add French translations.
+- Implemented styles for ``bleach`` within ``content_richtext`` plugin.
+- Documentation improvements.
+
+0.12.17
+-------
+2018-02-14
+
+- Security fixes in db_store plugin.
+- Minor fixes and cleanups.
+- If CKEditor is installed, use it (rich text) for success page message.
+
+0.12.16
+-------
+2018-01-21
+
+.. note::
+
+    Note, that this release contains minor backwards incompatible changes, that
+    may slightly break your JS and/or styling.
+
+    The `form-horizontal` class attribute on the main form with elements (in
+    templates) has been replaced with `fobi-form` id attribute.
+
+    Affected files:
+
+    - src/fobi/templates/fobi/generic/add_form_element_entry_ajax.html
+    - src/fobi/templates/fobi/generic/edit_form_element_entry_ajax.html
+    - src/fobi/templates/fobi/generic/snippets/form_ajax.html
+
+    If you have modified any of these, you might want to check and update
+    your code.
+
+- Invisible reCAPTCHA form plugin (security) added.
+- Clean up templates.
+- Introduce a form_id block. The following templates were affected.
+
+0.12.15
+-------
+2018-01-17
+
+- Minor clean up of HTML templates (in some templates
+  ``hidden_form_element_wrapper_html_class`` was used while others
+  ``form_element_wrapper_hidden_html_class``). Now
+  ``form_element_wrapper_hidden_html_class`` is used everywhere. Some HTML
+  files have been re-indented (2 spaces).
+- Minor clean up of JS.
+- Optionally limit file extensions for file upload element
+
+0.12.14
+-------
+2018-01-10
+
+- Minor clean up of HTML templates (unused classes removed).
+- Nicer captcha (simple captcha) for bootstrap3 and foundation5 themes.
+
+0.12.13
+-------
+2018-01-09
+
+.. note::
+
+    Note, that this release contains minor backwards incompatible changes, that may
+    slightly break your JS and/or styling.
+
+    The `form-horizontal` class attribute on the main form with elements (in
+    templates) has been replaced with `fobi-form` id attribute.
+
+    Affected files:
+
+    - /src/fobi/contrib/themes/djangocms_admin_style_theme/static/djangocms_admin_style_theme/js/fobi.djangocms_admin_style_theme.edit.js
+    - /src/fobi/contrib/themes/djangocms_admin_style_theme/templates/djangocms_admin_style_theme/edit_form_entry_ajax.html
+    - /src/fobi/contrib/themes/foundation5/static/foundation5/js/foundation5_fobi_extras.js
+    - /src/fobi/contrib/themes/foundation5/templates/foundation5/edit_form_entry_ajax.html
+    - /src/fobi/contrib/themes/foundation5/templates/foundation5/edit_form_wizard_entry_ajax.html
+    - /src/fobi/contrib/themes/simple/static/simple/js/fobi.simple.edit.js
+    - /src/fobi/contrib/themes/simple/templates/simple/edit_form_entry_ajax.html
+    - /src/fobi/contrib/themes/simple/templates/simple/edit_form_wizard_entry_ajax.html
+    - /src/fobi/contrib/themes/bootstrap3/static/bootstrap3/js/bootstrap3_fobi_extras.js
+    - /src/fobi/templates/fobi/generic/edit_form_entry_ajax.html
+
+    If you have modified any of these, please double check that your edit views
+    work and look properly.
+
+- Fixes in simple and django-cms-admin-style themes (assets being loaded
+  incorrectly since 0.12.6).
+- Base template, as well as templates of all the themes have been made a
+  little bit more flexible.
+- Minor documentation fixes.
+
+0.12.12
+-------
+2018-01-03
+
+- More consistent loading of assets (JS, CSS) in add- and
+  edit-form-element-entry templates.
+- Copyright and licenses year update.
+- Minor fixes in the widgets.
+- Clean up.
+
+0.12.11
+-------
+2017-12-27
+
+- Clean up Django < 1.8 code.
+- Clean up old code.
+
+0.12.10
+-------
+2017-12-24
+
+- Django 2.0 support (experimental).
+- (Temporary) replace ``django-autoslug`` package with
+  ``django-autoslug-iplweb``, which works fine for Django versions >=1.8,<=2.0.
+
+0.12.9
+------
+2017-12-21
+
+- Added content markdown plugin.
+
+0.12.8
+------
+2017-12-19
+
+- Added common form callback ``AutoFormMail`` for auto mailing the form
+  data (without need to add the mail plugin to the form).
+
+0.12.7
+------
+2017-12-17
+
+- Minor fixes (in the add form element entry bootstrap3 template).
+- Add content rich text plugin (based on CKEditor).
+- Added common form callback ``AutoFormDbStore`` for auto saving the form
+  data (without need to add the db_store plugin to the form).
+
+0.12.6
+------
+2017-12-12
+
+- Clean up.
+- Minor documentation fixes.
+- Minor plugin clean-up/fixes (``captcha``, ``recaptcha``, ``content_text``).
+- Minor Python 3 fixes.
+- Minor fixes in FormWizard ``get_absolute_url`` method.
+
 0.12.5
 ------
 2017-09-27
@@ -79,7 +280,7 @@ are used for versioning (schema follows below):
 2017-05-29
 
 - Minor fixes in ``content_text`` ``drf_integration`` plugin.
-- Added ``imageurl`` support to the ``mailchimp_impoter`` plugin.
+- Added ``imageurl`` support to the ``mailchimp_importer`` plugin.
 
 0.11.10
 -------
@@ -229,10 +430,12 @@ hesitate to `contact her <mailto:anahit.gardishyan@gmail.com>`_.
 ----
 2016-11-16
 
-Note, that this release contains minor backwards incompatible changes, that may
-break your code. Two additional arguments have been added to the 
-`submit_plugin_form_data` method of the form element plugins. If you have 
-written custom form element plugins - update your code.
+.. note::
+
+    Note, that this release contains minor backwards incompatible changes, that may
+    break your code. Two additional arguments have been added to the
+    `submit_plugin_form_data` method of the form element plugins. If you have
+    written custom form element plugins - update your code.
 
 - Added `form_entry_elements` and `kwargs` to the `submit_plugin_form_data`
   method of the form element plugins. Make sure to update your custom 
@@ -252,9 +455,11 @@ written custom form element plugins - update your code.
 ------
 2016-11-13
 
-Announcing dropping support of Python 2.6 and Django 1.7. As of 0.9.17
-everything is still backwards compatible with Django 1.7, but in future
-versions it will be wiped out.
+.. note::
+
+    Announcing dropping support of Python 2.6 and Django 1.7. As of 0.9.17
+    everything is still backwards compatible with Django 1.7, but in future
+    versions it will be wiped out.
 
 - Value validations for Integer and Text Fields.
 - Hide previous button in form wizard template for bootstrap3 on first step.
@@ -282,9 +487,11 @@ versions it will be wiped out.
 ------
 2016-11-05
 
-Announcing dropping support of Django 1.5 and 1.6. As of 0.9.17 everything is
-still backwards compatible with versions 1.5 and 1.6, but in future versions
-compatibility with these versions will be wiped out.
+.. note::
+
+    Announcing dropping support of Django 1.5 and 1.6. As of 0.9.13 everything is
+    still backwards compatible with versions 1.5 and 1.6, but in future versions
+    compatibility with these versions will be wiped out.
 
 - Fix backwards compatibility of `slider` and `range_select` plugins with
   Django versions 1.5 and 1.6.
@@ -380,14 +587,16 @@ compatibility with these versions will be wiped out.
 ---
 2016-10-24
 
-Note, that this release contain minor backwards incompatible changes, that
-may break your existing code (your data is left intact). If you have written
-custom form element plugins you should update your code!
+.. note::
+
+    Note, that this release contain minor backwards incompatible changes, that
+    may break your existing code (your data is left intact). If you have written
+    custom form element plugins you should update your code!
 
 - The :method:`get_form_field_instances`
   and :method:`_get_form_field_instances` of
   the :class:`fobi.base.FormElementPlugin` both accept two new optional
-  arguments: `form_entry` and `form_element_entries` as well as **kwargs.
+  arguments: `form_entry` and `form_element_entries` as well as `**kwargs`.
   Make sure to update your custom plugins if you have written any.
 - Minor fixes in the form wizards: forms in intermediate steps do receive
   updates from the `submit_plugin_form_data` of the plugins.
@@ -471,7 +680,7 @@ Release supported by `Lund University Cognitive Science
 <http://www.lucs.lu.se/choice-blindness-group/>`_.
 
 - Adding form-wizards functionality. Note, that at the moment only
-  `bootstrap3` theme was updated to filly support the form wizards. Although,
+  `bootstrap3` theme was updated to fully support the form wizards. Although,
   all other themes would by default support form-wizard functionality, they
   may not look as nice as they should be (to be fixed in 0.8.x releases
   shortly).
@@ -482,16 +691,18 @@ Release supported by `Lund University Cognitive Science
   may need to update your custom CSS/JS/HTML accordingly. See the listing
   0.8.a for the files affected.
 - An additional property `form_view_form_entry_option_class` has been added
-  to all the themes. Change your custom CSS/jS/HTML accordingly. See the
+  to all the themes. Change your custom CSS/JS/HTML accordingly. See the
   listing 0.8.b for the files affected.
 - Fixed drag-and-drop not working for ordering of form elements. #43
 - Fixed issue with non-proper rendering of the form-importer templates.
 
-Although this release does not contain backwards incompatible changes, there
-have been several changes in GUI and some parts of the generic HTML and themes
-were updated. If you have custom themes implemented, you should likely make
-some minor updates to the HTML in order to reflect the latest GUI changes.
-The following templates have been affected:
+.. note::
+
+    Although this release does not contain backwards incompatible changes, there
+    have been several changes in GUI and some parts of the generic HTML and themes
+    were updated. If you have custom themes implemented, you should likely make
+    some minor updates to the HTML in order to reflect the latest GUI changes.
+    The following templates have been affected:
 
 New files
 ~~~~~~~~~
@@ -709,11 +920,13 @@ Release sponsored by `Goldmund, Wyldebeast & Wunderliebe
 - Minor UI improvements. Adding "Service" tab in the edit view which contains
   links to export form to JSON and delete form.
 
-Although this release does not contain backwards incompatible changes, there
-have been several changes in GUI and some parts of the generic HTML and themes
-were updated. If you have custom themes implemented, you should likely make
-some minor updates to the HTML in order to reflect the latest GUI changes.
-The following templates have been affected:
+.. note::
+
+    Although this release does not contain backwards incompatible changes, there
+    have been several changes in GUI and some parts of the generic HTML and themes
+    were updated. If you have custom themes implemented, you should likely make
+    some minor updates to the HTML in order to reflect the latest GUI changes.
+    The following templates have been affected:
 
 New files
 ~~~~~~~~~
@@ -838,16 +1051,18 @@ Existing files
 ---
 2015-04-06
 
-Note, that this release contains minor backwards incompatible changes. The
-changes may affect your existing forms and data. Read the notes below
-carefully.
+.. note::
+
+    Note, that this release contains minor backwards incompatible changes. The
+    changes may affect your existing forms and data. Read the notes below
+    carefully.
 
 - Fixed previously wrongly labeled (in `AppConf`) add-ons/plugins
   (`fobi.contrib.plugins.form_handlers.db_store`,
   `fobi.contrib.apps.feincms_integration`,
   `fobi.contrib.apps.djangocms_integration`,
   `fobi.contrib.apps.mezzanine_integration`). Due to the change, you would
-  likely have to to rename a couple of database tables and update referencies
+  likely have to rename a couple of database tables and update references
   accordingly. No migrations to solve the issue are included at the moment.
 
 0.4.36
@@ -895,7 +1110,7 @@ carefully.
 2015-03-23
 
 - When path of the uploaded file (plugins) doesn't yet exist, create it,
-  instaid of failing.
+  instead of failing.
 
 0.4.30
 ------
@@ -1201,21 +1416,29 @@ carefully.
   precisely in order to painlessly upgrade your django-fobi==0.3.* to
   django-fobi==0.4.*:
 
-  1. Install django-fobi>=0.4.2::
+  1. Install django-fobi>=0.4.2:
+
+     .. code-block:: sh
 
          pip install django-fobi>=0.4.2
 
-  2. In your settings change the::
+  2. In your settings change the:
+
+     .. code-block:: python
 
          'fobi.contrib.plugins.form_elements.fields.birthday'
          
-     to::
+     to:
+
+     .. code-block:: python
 
          'fobi.contrib.plugins.form_elements.fields.date_drop_down'
 
   3. Run the ``migrate_03_to_04`` management command. Note, that as of version
      0.4.24, the `migrate_03_to_04` command has been renamed to
-     `fobi_migrate_03_to_04`.::
+     `fobi_migrate_03_to_04`.:
+
+     .. code-block:: sh
 
          ./manage.py migrate_03_to_04
 
@@ -1230,10 +1453,12 @@ carefully.
 ---
 2014-12-03
 
-Note, that this release contains minor backwards incompatible changes. The
-changes may affect your existing forms and data. Read the notes below
-carefully (UPDATE 2014-12-04: the django-fobi==0.4.2 contains a management 
-command which makes the necessary changes in the database for safe upgrade).
+.. note::
+
+    Note, that this release contains minor backwards incompatible changes. The
+    changes may affect your existing forms and data. Read the notes below
+    carefully (UPDATE 2014-12-04: the django-fobi==0.4.2 contains a management
+    command which makes the necessary changes in the database for safe upgrade).
 
 - The ``captcha`` field has been moved from 
   ``fobi.contrib.plugins.form_elements.fields.captcha`` to
@@ -1250,7 +1475,7 @@ command which makes the necessary changes in the database for safe upgrade).
   your project apps, make necessary path changes and update the package paths
   in ``INSTALLED_APPS`` settings module (settings.py) before upgrading to this
   version. Then, in Django admin management interface, replace all the
-  occurances of ``Birthday`` field with ``Date drop down`` field.
+  occurrences of ``Birthday`` field with ``Date drop down`` field.
 - Better error validation/handling of hidden fields. A new form snippet 
   template added for displaying the non-field and hidden fields errors. The new
   template makes a part of a standard theme as an attribute
@@ -1297,11 +1522,13 @@ command which makes the necessary changes in the database for safe upgrade).
 ---
 2014-11-09
 
-Note, that this release contains minor backwards incompatible changes. The
-changes do not anyhow affect your existing forms or data. The only thing you
-need to do is update the app paths in the ``settings`` module of your project.
+.. note::
 
-- Minor core improvements related to the themeing of the form handler plugins.
+    Note, that this release contains minor backwards incompatible changes. The
+    changes do not anyhow affect your existing forms or data. The only thing you
+    need to do is update the app paths in the ``settings`` module of your project.
+
+- Minor core improvements related to the theming of the form handler plugins.
 - Several presentational form element plugins have been renamed.
   The ``fobi.contrib.plugins.form_elements.content.image`` plugin has been
   renamed to ``fobi.contrib.plugins.form_elements.content.content_image``.

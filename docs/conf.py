@@ -20,6 +20,7 @@ import os
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('../examples'))
+sys.path.insert(0, os.path.abspath('../examples/simple'))
 
 from nine.versions import DJANGO_LTE_1_7, DJANGO_GTE_1_8, DJANGO_GTE_1_7
 
@@ -36,7 +37,7 @@ try:
 except ImportError as err:
     version = '0.1'
     project = u'django-fobi'
-    copyright = u'2014, Artur Barseghyan <artur.barseghyan@gmail.com>'
+    copyright = u'2014-2018, Artur Barseghyan <artur.barseghyan@gmail.com>'
 
 try:
     from simple import settings_docs as docs_settings

@@ -8,23 +8,20 @@ import re
 import traceback
 import uuid
 
-
-from collections import (
-    defaultdict,
-    # OrderedDict,
-)
+from collections import defaultdict, OrderedDict
 
 import simplejson as json
 
-from six import with_metaclass, string_types
-
 from django import forms
 from django.forms import ModelForm
+from django.forms.utils import ErrorList
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.template import RequestContext, Template
 
-from nine.versions import DJANGO_GTE_1_7
+from nine.versions import DJANGO_GTE_1_8
+
+from six import with_metaclass, string_types
 
 from .constants import CALLBACK_STAGES
 from .data_structures import SortableDict
@@ -52,6 +49,7 @@ from .settings import (
     CUSTOM_THEME_DATA,
     DEBUG,
     DEFAULT_THEME,
+    FAIL_ON_ERRORS_IN_FORM_ELEMENT_PLUGINS,
     FAIL_ON_ERRORS_IN_FORM_HANDLER_PLUGINS,
     FAIL_ON_ERRORS_IN_FORM_WIZARD_HANDLER_PLUGINS,
     FAIL_ON_MISSING_FORM_ELEMENT_PLUGINS,
@@ -61,18 +59,14 @@ from .settings import (
     FAIL_ON_MISSING_INTEGRATION_FORM_HANDLER_PLUGINS,
     FORM_HANDLER_PLUGINS_EXECUTION_ORDER,
     FORM_WIZARD_HANDLER_PLUGINS_EXECUTION_ORDER,
+    SORT_PLUGINS_BY_VALUE,
     THEME_FOOTER_TEXT,
     # FAIL_ON_ERRORS_IN_FORM_ELEMENT_PLUGINS,
 )
 
-if DJANGO_GTE_1_7:
-    from django.forms.utils import ErrorList
-else:
-    from django.forms.util import ErrorList
-
 __title__ = 'fobi.base'
 __author__ = 'Artur Barseghyan <artur.barseghyan@gmail.com>'
-__copyright__ = '2014-2017 Artur Barseghyan'
+__copyright__ = '2014-2018 Artur Barseghyan'
 __license__ = 'GPL 2.0/LGPL 2.1'
 __all__ = (
     'assemble_form_field_widget_class',
@@ -295,6 +289,10 @@ class BaseTheme(object):
     view_form_entry_ajax_template = 'fobi/generic/view_form_entry_ajax.html'
 
     view_embed_form_entry_ajax_template = None
+
+    form_entry_inactive_template = 'fobi/generic/form_entry_inactive.html'
+    form_entry_inactive_ajax_template = \
+        'fobi/generic/form_entry_inactive_ajax.html'
 
     # ***********************************************************************
     # *********************** Form element entry CUD ************************
@@ -638,11 +636,7 @@ class BaseTheme(object):
 
         :return list:
         """
-        media_css = self.media_css[:]
-        if self.plugin_media_css:
-            media_css += self.plugin_media_css
-
-        media_css = uniquify_sequence(media_css)
+        media_css = uniquify_sequence(self.media_css + self.plugin_media_css)
 
         return media_css
 
@@ -651,11 +645,7 @@ class BaseTheme(object):
 
         :return list:
         """
-        media_js = self.media_js[:]
-        if self.plugin_media_js:
-            media_js += self.plugin_media_js
-
-        media_js = uniquify_sequence(media_js)
+        media_js = uniquify_sequence(self.media_js + self.plugin_media_js)
 
         return media_js
 
@@ -813,7 +803,7 @@ class BaseFormFieldPluginForm(BasePluginForm):
 
         return True
 
-    if not DJANGO_GTE_1_7:
+    if not DJANGO_GTE_1_8:
         def add_error(self, field, error):
             """Backwards compatibility hack."""
             raise forms.ValidationError(error, 'invalid')
@@ -1027,7 +1017,7 @@ class BasePlugin(object):
                     field,
                     self.plugin_data.get(field, default_value)
                 )
-            except Exception as err:
+            except Exception:
                 setattr(self.data, field, default_value)
 
     def process_plugin_data(self, fetch_related_data=False):
@@ -1620,7 +1610,7 @@ class FormElementPlugin(BasePlugin):
                     has_value=has_value,
                     **kwargs
                 )
-            except AttributeError as err:
+            except AttributeError:
                 return []
 
         # This is the flexible part. We delegate implementation to the
@@ -1656,7 +1646,7 @@ class FormElementPlugin(BasePlugin):
                     form_element_entry=form_element_entry,
                     origin=origin
                 )
-            except Exception as err:
+            except Exception:
                 pass
 
     def get_origin_kwargs_update_func_results(self, kwargs_update_func,
@@ -1680,7 +1670,10 @@ class FormElementPlugin(BasePlugin):
                 if kwargs_update:
                     return kwargs_update
             except Exception as err:
-                logger.debug(str(err))
+                if FAIL_ON_ERRORS_IN_FORM_ELEMENT_PLUGINS:
+                    raise err
+                else:
+                    logger.error(str(err))
         return {}
 
     def _submit_plugin_form_data(self, form_entry, request, form,
@@ -2784,7 +2777,7 @@ def assemble_form_field_widget_class(base_class, plugin):
 def get_registered_plugins(registry, as_instances=False, sort_items=True):
     """Get registered plugins.
 
-    Get a list of registered plugins in a form if tuple (plugin name, plugin
+    Get a list of registered plugins in a form of tuple (plugin name, plugin
     description). If not yet auto-discovered, auto-discovers them.
 
     :param registry:
@@ -2809,10 +2802,12 @@ def get_registered_plugins(registry, as_instances=False, sort_items=True):
     return registered_plugins
 
 
-def get_registered_plugins_grouped(registry, sort_items=True):
+def get_registered_plugins_grouped(registry,
+                                   sort_items=True,
+                                   sort_by_value=SORT_PLUGINS_BY_VALUE):
     """Get registered plugins grouped.
 
-    Gets a list of registered plugins in a form if tuple (plugin name, plugin
+    Gets a list of registered plugins in a form of tuple (plugin name, plugin
     description). If not yet auto-discovered, auto-discovers them.
 
     :return dict:
@@ -2829,11 +2824,17 @@ def get_registered_plugins_grouped(registry, sort_items=True):
             registered_plugins[plugin_group] = []
         registered_plugins[plugin_group].append((uid, plugin_name))
 
-    if sort_items:
-        for key, prop in registered_plugins.items():
-            prop.sort()
+    if not sort_items:
+        return registered_plugins
 
-    return registered_plugins
+    ordered_registered_plugins = OrderedDict()
+    for key, prop in sorted(registered_plugins.items()):
+        if sort_by_value:
+            ordered_registered_plugins[key] = sorted(prop, key=lambda t: t[1])
+        else:
+            ordered_registered_plugins[key] = sorted(prop)
+
+    return ordered_registered_plugins
 
 
 def get_registered_plugin_uids(registry, flattern=True, sort_items=True):
@@ -2876,7 +2877,7 @@ def validate_plugin_uid(registry, plugin_uid):
 def get_registered_form_element_plugins():
     """Get registered form element plugins.
 
-    Gets a list of registered plugins in a form if tuple (plugin name, plugin
+    Gets a list of registered plugins in a form of tuple (plugin name, plugin
     description). If not yet auto-discovered, auto-discovers them.
 
     :return list:
@@ -2884,21 +2885,26 @@ def get_registered_form_element_plugins():
     return get_registered_plugins(form_element_plugin_registry)
 
 
-def get_registered_form_element_plugins_grouped():
+def get_registered_form_element_plugins_grouped(
+        sort_by_value=SORT_PLUGINS_BY_VALUE
+):
     """Get registered form element plugins grouped.
 
-    Gets a list of registered plugins in a form if tuple (plugin name, plugin
+    Gets a list of registered plugins in a form of tuple (plugin name, plugin
     description). If not yet auto-discovered, auto-discovers them.
 
     :return dict:
     """
-    return get_registered_plugins_grouped(form_element_plugin_registry)
+    return get_registered_plugins_grouped(
+        form_element_plugin_registry,
+        sort_by_value=sort_by_value
+    )
 
 
 def get_registered_form_element_plugin_uids(flattern=True):
     """Get registered form element plugin uids.
 
-    Gets a list of registered plugins in a form if tuple (plugin name, plugin
+    Gets a list of registered plugins in a form of tuple (plugin name, plugin
     description). If not yet auto-discovered, auto-discovers them.
 
     :return list:
@@ -3008,7 +3014,7 @@ def get_ignorable_form_fields(form_element_entries):
             form_element_plugin = form_element_entry.get_plugin()
             try:
                 ignorable_form_fields.append(form_element_plugin.data.name)
-            except AttributeError as err:
+            except AttributeError:
                 pass
 
     return ignorable_form_fields

@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import logging
 
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from fobi.base import (
     FormElementPlugin,
@@ -69,7 +70,7 @@ except ImportError as e:
 __title__ = 'fobi.contrib.plugins.form_elements.security.' \
             'recaptcha.base'
 __author__ = 'Artur Barseghyan <artur.barseghyan@gmail.com>'
-__copyright__ = '2014-2017 Artur Barseghyan'
+__copyright__ = '2014-2018 Artur Barseghyan'
 __license__ = 'GPL 2.0/LGPL 2.1'
 __all__ = ('ReCaptchaInputPlugin',)
 
@@ -97,7 +98,7 @@ class ReCaptchaInputPlugin(FormElementPlugin):
             'help_text': self.data.help_text,
             # 'initial': self.data.initial,
             'required': self.data.required,
-            'widget': ReCaptchaWidget(attrs=widget_attrs),
+            'widget': ReCaptchaWidget(public_key=settings.RECAPTCHA_PUBLIC_KEY, attrs=widget_attrs),
         }
 
         return [(self.data.name, ReCaptchaField, field_kwargs)]
