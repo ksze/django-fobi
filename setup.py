@@ -4,7 +4,7 @@ import sys
 from distutils.version import LooseVersion
 from setuptools import setup, find_packages
 
-version = '0.13.3'
+version = '0.13.6'
 
 # ***************************************************************************
 # ************************** Python version *********************************
@@ -232,13 +232,10 @@ install_requires = []
 if DJANGO_INSTALLED:
     if DJANGO_1_5 or DJANGO_1_6 or DJANGO_1_7:
         install_requires = [
-            # 'django-autoslug==1.7.1',
             'bleach',
-            'django-autoslug-iplweb',
-            # 'django-formtools>=1.0',
+            'django-autoslug-iplweb>=1.9.4',
             'django-nine>=0.1.13',
             'django-nonefield>=0.1',
-            # 'ordereddict>=1.1',
             'Pillow>=2.0.0',
             'requests>=1.0.0',
             'six>=1.9',
@@ -248,13 +245,11 @@ if DJANGO_INSTALLED:
 
     elif DJANGO_1_8:
         install_requires = [
-            # 'django-autoslug==1.7.1',
             'bleach',
-            'django-autoslug-iplweb',
+            'django-autoslug-iplweb>=1.9.4',
             'django-formtools>=1.0',
             'django-nine>=0.1.13',
             'django-nonefield>=0.1',
-            # 'ordereddict>=1.1',
             'Pillow>=2.0.0',
             'requests>=1.0.0',
             'six>=1.9',
@@ -263,13 +258,11 @@ if DJANGO_INSTALLED:
         ]
     elif DJANGO_1_9:
         install_requires = [
-            # 'django-autoslug==1.9.3',
             'bleach',
-            'django-autoslug-iplweb',
+            'django-autoslug-iplweb>=1.9.4',
             'django-formtools>=1.0',
             'django-nine>=0.1.13',
             'django-nonefield>=0.1',
-            # 'ordereddict>=1.1',
             'Pillow>=2.0.0',
             'requests>=1.0.0',
             'six>=1.9',
@@ -278,13 +271,11 @@ if DJANGO_INSTALLED:
         ]
     elif DJANGO_1_10:
         install_requires = [
-            # 'django-autoslug==1.9.3',
             'bleach',
-            'django-autoslug-iplweb',
+            'django-autoslug-iplweb>=1.9.4',
             'django-formtools>=1.0',
             'django-nine>=0.1.13',
             'django-nonefield>=0.1',
-            # 'ordereddict>=1.1',
             'Pillow>=2.0.0',
             'requests>=1.0.0',
             'six>=1.9',
@@ -293,13 +284,11 @@ if DJANGO_INSTALLED:
         ]
     elif DJANGO_1_11:
         install_requires = [
-            # 'django-autoslug==1.9.3',
             'bleach',
-            'django-autoslug-iplweb',
+            'django-autoslug-iplweb>=1.9.4',
             'django-formtools>=2.0',
             'django-nine>=0.1.13',
             'django-nonefield>=0.1',
-            # 'ordereddict>=1.1',
             'Pillow>=2.0.0',
             'requests>=1.0.0',
             'six>=1.9',
@@ -312,13 +301,11 @@ if DJANGO_INSTALLED:
         # )
     elif DJANGO_2_0:
         install_requires = [
-            # 'django-autoslug==1.9.3',
             'bleach',
-            'django-autoslug-iplweb',
+            'django-autoslug-iplweb>=1.9.4',
             'django-formtools>=2.0',
             'django-nine>=0.1.13',
-            'django-nonefield>=0.1',
-            # 'ordereddict>=1.1',
+            'django-nonefield>=0.3',
             'Pillow>=2.0.0',
             'requests>=1.0.0',
             'six>=1.9',
@@ -334,11 +321,10 @@ if DJANGO_INSTALLED:
 if not install_requires:
     install_requires = [
         'bleach',
-        'django-autoslug>=1.9.3',
-        'django-formtools>=1.0',
+        'django-autoslug-iplweb>=1.9.4',
+        'django-formtools>=2.0',
         'django-nine>=0.1.13',
         'django-nonefield>=0.1',
-        # 'ordereddict>=1.1',
         'Pillow>=2.0.0',
         'requests>=1.0.0',
         'six>=1.9',
@@ -394,13 +380,12 @@ setup(
                 "customisable, modular, user- and developer- friendly.",
     long_description="{0}{1}".format(readme, screenshots),
     classifiers=[
-        # "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        # "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Environment :: Web Environment",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
         "License :: OSI Approved :: GNU Lesser General Public License v2 or "
