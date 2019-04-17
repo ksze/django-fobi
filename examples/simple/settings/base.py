@@ -350,6 +350,7 @@ INSTALLED_APPS = [
     'fobi.contrib.plugins.form_handlers.db_store',
     'fobi.contrib.plugins.form_handlers.http_repost',
     'fobi.contrib.plugins.form_handlers.mail',
+    'fobi.contrib.plugins.form_handlers.mail_sender',
 
     # ***********************************************************************
     # ***********************************************************************
@@ -461,6 +462,7 @@ INSTALLED_APPS = [
     # Form handlers
     'fobi.contrib.apps.drf_integration.form_handlers.db_store',
     'fobi.contrib.apps.drf_integration.form_handlers.mail',
+    'fobi.contrib.apps.drf_integration.form_handlers.mail_sender',
     'fobi.contrib.apps.drf_integration.form_handlers.http_repost',
 
     # ***********************************************************************

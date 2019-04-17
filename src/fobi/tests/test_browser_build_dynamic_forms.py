@@ -24,7 +24,7 @@ else:
 
 __title__ = 'fobi.tests.test_browser_build_dynamic_forms'
 __author__ = 'Artur Barseghyan <artur.barseghyan@gmail.com>'
-__copyright__ = '2014-2018 Artur Barseghyan'
+__copyright__ = '2014-2019 Artur Barseghyan'
 __license__ = 'GPL 2.0/LGPL 2.1'
 __all__ = (
     'FobiBrowserBuldDynamicFormsTest',
@@ -502,6 +502,7 @@ class FobiBrowserBuldDynamicFormsTest(BaseFobiBrowserBuldDynamicFormsTest):
 
         # Add form elements
         self._test_add_form_elements(create_form=True)
+        self._test_add_form_handlers(create_form=False)
 
         # self._sleep(wait)
 
