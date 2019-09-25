@@ -19,8 +19,6 @@ from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.template import RequestContext, Template
 
-from nine.versions import DJANGO_GTE_1_8
-
 from six import with_metaclass, string_types
 
 from .constants import CALLBACK_STAGES
@@ -116,6 +114,7 @@ __all__ = (
     'get_registered_form_callbacks',
     'get_registered_form_element_plugin_uids',
     'get_registered_form_element_plugins',
+    'get_registered_form_element_plugins_grouped',
     'get_registered_form_handler_plugin_uids',
     'get_registered_form_handler_plugins',
     'get_registered_form_wizard_handler_plugin_uids',
@@ -130,8 +129,12 @@ __all__ = (
     'get_registered_plugins',
     'get_registered_theme_uids',
     'get_registered_themes',
+    'get_theme',
+    'integration_form_callback_registry',
     'integration_form_element_plugin_registry',
     'integration_form_handler_plugin_registry',
+    'IntegrationFormCallback',
+    'IntegrationFormCallbackRegistry',
     'IntegrationFormElementPlugin',
     'IntegrationFormElementPluginDataStorage',
     'IntegrationFormElementPluginProcessor',
@@ -140,11 +143,9 @@ __all__ = (
     'IntegrationFormHandlerPlugin',
     'IntegrationFormHandlerPluginDataStorage',
     'IntegrationFormHandlerPluginRegistry',
-    'IntegrationFormCallbackRegistry',
-    'IntegrationFormCallback',
-    'integration_form_callback_registry',
     'run_form_handlers',
     'run_form_wizard_handlers',
+    'submit_plugin_form_data',
     'theme_registry',
     'validate_form_element_plugin_uid',
     'validate_form_handler_plugin_uid',
@@ -188,6 +189,51 @@ class BaseTheme(object):
     # General HTML specific
     project_name = _("Build your forms")  # Project name
     footer_text = ''  # '&copy; Company 2014'
+
+    # ***********************************************************************
+    # ***********************************************************************
+    # ********************** Theme specific urls*****************************
+    # ***********************************************************************
+    # ***********************************************************************
+
+    # form element entry
+
+    add_form_element_entry = 'fobi.add_form_element_entry'
+
+    add_form_handler_entry = 'fobi.add_form_handler_entry'
+    edit_form_handler_entry = 'fobi.edit_form_handler_entry'
+    delete_form_handler_entry = 'fobi.delete_form_handler_entry'
+
+    # form wizard entry
+
+    create_form_wizard_entry = 'fobi.create_form_wizard_entry'
+    import_form_wizard_entry = 'fobi.import_form_wizard_entry'
+    view_form_wizard_entry = 'fobi.view_form_wizard_entry'
+    edit_form_wizard_entry = 'fobi.edit_form_wizard_entry'
+    delete_form_wizard_entry = 'fobi.delete_form_wizard_entry'
+    export_form_wizard_entry = 'fobi.export_form_wizard_entry'
+
+    add_form_wizard_form_entry = 'fobi.add_form_wizard_form_entry'
+    delete_form_wizard_form_entry = 'fobi.delete_form_wizard_form_entry'
+
+    add_form_wizard_handler_entry = 'fobi.add_form_wizard_handler_entry'
+    edit_form_wizard_handler_entry = 'fobi.edit_form_wizard_handler_entry'
+    delete_form_wizard_handler_entry = 'fobi.delete_form_wizard_handler_entry'
+
+    # form entry
+
+    create_form_entry = 'fobi.create_form_entry'
+    import_form_entry = 'fobi.import_form_entry'
+    export_form_entry = 'fobi.export_form_entry'
+    delete_form_entry = 'fobi.delete_form_entry'
+    edit_form_entry = 'fobi.edit_form_entry'
+    view_form_entry = 'fobi.view_form_entry'
+
+
+    # dashboards
+
+    dashboard = 'fobi.dashboard'
+    form_wizards_dashboard = 'fobi.form_wizards_dashboard'
 
     # ***********************************************************************
     # ***********************************************************************
@@ -803,11 +849,6 @@ class BaseFormFieldPluginForm(BasePluginForm):
 
         return True
 
-    if not DJANGO_GTE_1_8:
-        def add_error(self, field, error):
-            """Backwards compatibility hack."""
-            raise forms.ValidationError(error, 'invalid')
-
 # *****************************************************************************
 # *****************************************************************************
 # ******************************** Plugins ************************************
@@ -844,7 +885,7 @@ class IntegrationFormElementPluginDataStorage(BaseDataStorage):
 
 
 class IntegrationFormHandlerPluginDataStorage(BaseDataStorage):
-        """Storage for `IntegrationFormHandlerPlugin`."""
+    """Storage for `IntegrationFormHandlerPlugin`."""
 
 
 class FormWizardHandlerPluginWidgetDataStorage(BaseDataStorage):
@@ -3044,7 +3085,12 @@ def get_cleaned_data(form, keys_to_remove=[], values_to_remove=[]):
         values=values_to_remove
     )
 
-    return cleaned_data
+    ordered_cleaned_data = OrderedDict()
+    for key in form.fields.keys():
+        if key in cleaned_data:
+            ordered_cleaned_data[key] = cleaned_data[key]
+
+    return ordered_cleaned_data
 
 
 def get_field_name_to_label_map(form, keys_to_remove=[], values_to_remove=[]):

@@ -8,17 +8,30 @@ even export forms into JSON format and import them on other instances. API
 allows you to build your own form elements and form handlers (mechanisms for
 handling the submitted form data).
 
+.. image:: https://img.shields.io/pypi/v/django-fobi.svg
+   :target: https://pypi.python.org/pypi/django-fobi
+   :alt: PyPI Version
+
+.. image:: https://img.shields.io/travis/barseghyanartur/django-fobi/master.svg
+   :target: http://travis-ci.org/barseghyanartur/django-fobi
+   :alt: Build Status
+
+.. image:: https://img.shields.io/badge/license-GPL--2.0--only%20OR%20LGPL--2.1--or--later-blue.svg
+   :target: https://github.com/barseghyanartur/django-fobi/#License
+   :alt: GPL-2.0-only OR LGPL-2.1-or-later
+
 Prerequisites
 =============
-- Django 1.8, 1.9, 1.10, 1.11, 2.0 and 2.1.
-- Python 2.7, 3.4, 3.5, 3.6, 3.7 and PyPy.
+- Django 1.8, 1.9, 1.10, 1.11, 2.0, 2.1 and 2.2.
+- Python 2.7, 3.4, 3.5, 3.6 and 3.7.
 
 Key concepts
 ============
-- Each form consists of elements. Form elements are divided into two groups:
+- Each form consists of elements. Form elements are divided into groups:
 
   (a) form fields (input field, textarea, hidden field, file field, etc.).
   (b) content (presentational) elements (text, image, embed video, etc.).
+  (c) security elements (captcha, etc).
 
 - Number of form elements is not limited.
 - Each form may contain handlers. Handler processes the form data (for example,
@@ -694,7 +707,7 @@ Defining the Sample mail handler plugin.
         name = _("Sample mail")
         form = SampleMailForm
 
-        def run(self, form_entry, request, form):
+        def run(self, form_entry, request, form, form_element_entries=None):
             """To be executed by handler."""
             send_mail(
                 self.data.subject,
@@ -703,6 +716,12 @@ Defining the Sample mail handler plugin.
                 [self.data.to_email],
                 fail_silently=True
             )
+
+Register the plugin
+
+.. code-block:: python
+
+    form_handler_plugin_registry.register(SampleMailHandlerPlugin)
 
 Some form handlers are configurable, some others not. In order to
 have a user friendly way of showing the form handler settings, what's
@@ -2330,6 +2349,12 @@ To test just your working environment type:
 
     ./runtests.py
 
+To run a single test class in a given test module in your working environment type:
+
+.. code-block:: sh
+
+    ./runtests.py src/fobi/tests/test_browser_build_dynamic_forms.py::FobiBrowserBuldDynamicFormsTest -k "test_2004_submit_form"
+
 It's assumed that you have all the requirements installed. If not, first
 install the test requirements:
 
@@ -2350,6 +2375,27 @@ version of the Selenium for Python (2.53.6) works fine with Firefox 47.
 Thus, instead of using system Firefox you could better use a custom one.
 
 For PhantomJS you need to have NodeJS installed.
+
+Set up ChromeDriver
+~~~~~~~~~~~~~~~~~~~
+1. Download ChromeDriver 42:
+
+    .. code-block:: sh
+
+        wget https://chromedriver.storage.googleapis.com/2.42/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+        sudo mv chromedriver /usr/bin/chromedriver42
+        sudo chown root:root /usr/bin/chromedriver42
+        sudo chmod +x /usr/bin/chromedriver42
+
+2. Specify the full path to your ChromeDriver in
+   ``CHROME_DRIVER_EXECUTABLE_PATH`` setting. Example:
+
+    .. code-block:: python
+
+        CHROME_DRIVER_EXECUTABLE_PATH = '/usr/bin/chromedriver42'
+
+After that your Selenium tests would work.
 
 Set up Firefox 47
 ~~~~~~~~~~~~~~~~~
@@ -2463,7 +2509,7 @@ or ask the `Author`_ how you could help.
 
 License
 =======
-GPL 2.0/LGPL 2.1
+GPL-2.0-only OR LGPL-2.1-or-later
 
 Support
 =======
